@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.18.0
 	cloud.google.com/go/pubsublite v1.3.0
 	github.com/joho/godotenv v1.4.0
-	github.com/vniche/twitter-go v0.0.4
+	github.com/vniche/twitter-go v0.0.8
 )
 
 require (
@@ -18,7 +18,6 @@ require (
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
