@@ -8,7 +8,7 @@ RUN go build -o "service" -tags musl ./
 
 FROM alpine:3
 
-LABEL org.opencontainers.image.source https://github.com/inpublic-io/twitter-api
+LABEL org.opencontainers.image.source https://github.com/inpublic-io/stream-tweets
 
 RUN apk update \
 	&& apk -U upgrade \
