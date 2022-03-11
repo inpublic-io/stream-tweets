@@ -16,13 +16,7 @@ RUN apk update \
 	&& update-ca-certificates --fresh \
 	&& rm -rf /var/cache/apk/*
 
-# adds inpublic user
-RUN addgroup inpublic \
-	&& adduser -S inpublic -u 1000 -G inpublic -G root
-
-USER inpublic
-
-COPY --from=build --chown=inpublic:inpublic /go/src/github.com/inpublic-io/stream-tweets/service /usr/local/bin/
+COPY --from=build /go/src/github.com/inpublic-io/stream-tweets/service /usr/local/bin/
 RUN chmod +x /usr/local/bin/service
 
 ENTRYPOINT [ "/usr/local/bin/service" ]
