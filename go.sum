@@ -191,8 +191,8 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/vniche/twitter-go v0.0.8 h1:wm4TKmdO6d1TvSynBBogdFae7UnsYKl32U6V+yYWHP8=
-github.com/vniche/twitter-go v0.0.8/go.mod h1:puk7xR2QUg6j5odkxYEm9oYZgenxvwbh75Z5Q7gt0Dc=
+github.com/vniche/twitter-go v0.0.9 h1:hIFeY92kWAHt9uqNn1aOVeC9thZchdDm1FtIelwJ7Ro=
+github.com/vniche/twitter-go v0.0.9/go.mod h1:puk7xR2QUg6j5odkxYEm9oYZgenxvwbh75Z5Q7gt0Dc=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
