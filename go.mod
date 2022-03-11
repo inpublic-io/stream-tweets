@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.18.0
 	cloud.google.com/go/pubsublite v1.3.0
 	github.com/joho/godotenv v1.4.0
-	github.com/vniche/twitter-go v0.0.9
+	github.com/vniche/twitter-go v0.0.10
 )
 
 require (
