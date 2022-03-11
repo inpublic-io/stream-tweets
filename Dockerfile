@@ -17,8 +17,10 @@ RUN apk update \
 	&& rm -rf /var/cache/apk/*
 
 # adds inpublic user
-RUN	addgroup inpublic \
-	&& adduser -S inpublic -u 1000 -G inpublic
+RUN addgroup inpublic \
+	&& adduser -S inpublic -u 1000 -G inpublic \
+	&& mkdir -p /etc/secrets \
+	&& chown -R 1000:1000 /etc/secrets/
 
 USER inpublic
 
