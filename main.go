@@ -98,6 +98,11 @@ func main() {
 				return
 			}
 
+			if len(message.Errors) > 0 {
+				log.Fatalf("errors from stream: %+v", message.Errors)
+				return
+			}
+
 			if len(message.Tweet.Entities.Hashtags) <= 10 {
 				publish(ctx, message)
 			}
