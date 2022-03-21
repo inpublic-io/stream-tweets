@@ -84,6 +84,8 @@ func main() {
 		log.Fatalf("unable to listen to tweets stream: %+v", err)
 	}
 
+	fmt.Printf("listening to stream:\n")
+
 	for {
 		select {
 		case <-quit:
