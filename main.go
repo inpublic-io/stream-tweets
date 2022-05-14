@@ -29,19 +29,19 @@ func init() {
 		log.Fatalf("TWITTER_BEARER_TOKEN env var is required")
 	}
 
-	streamName, ok = os.LookupEnv(os.Getenv("STREAM_NAME"))
+	streamName, ok = os.LookupEnv("STREAM_NAME")
 	if !ok {
 		streamName = "tweets"
 	}
 
-	redisHost, ok := os.LookupEnv(os.Getenv("REDIS_HOST"))
+	redisHost, ok := os.LookupEnv("REDIS_HOST")
 	if !ok {
 		redisHost = "localhost"
 	}
 
 	redisClient = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:6379", redisHost),
-		Password: "",
+		Password: os.Getenv("REDIS_PASSWORD"),
 		DB:       0, // use default DB
 	})
 
