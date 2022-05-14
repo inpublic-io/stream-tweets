@@ -36,11 +36,11 @@ func init() {
 
 	redisHost, ok := os.LookupEnv("REDIS_HOST")
 	if !ok {
-		redisHost = "localhost"
+		redisHost = "localhost:6379"
 	}
 
 	redisClient = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:6379", redisHost),
+		Addr:     redisHost,
 		Password: os.Getenv("REDIS_PASSWORD"),
 		DB:       0, // use default DB
 	})
