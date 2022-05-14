@@ -8,36 +8,52 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
-	"cloud.google.com/go/pubsub"
-	"cloud.google.com/go/pubsublite/pscompat"
+	redis "github.com/go-redis/redis/v8"
 	_ "github.com/joho/godotenv/autoload"
 	twitter "github.com/vniche/twitter-go"
 )
 
-var publisher *pscompat.PublisherClient
+var (
+	twitterToken  string
+	streamName    string
+	redisClient   *redis.Client
+	twitterClient *twitter.Client
+)
+
+func init() {
+	var ok bool
+	twitterToken, ok = os.LookupEnv("TWITTER_BEARER_TOKEN")
+	if !ok {
+		log.Fatalf("TWITTER_BEARER_TOKEN env var is required")
+	}
+
+	streamName, ok = os.LookupEnv(os.Getenv("STREAM_NAME"))
+	if !ok {
+		streamName = "tweets"
+	}
+
+	redisHost, ok := os.LookupEnv(os.Getenv("REDIS_HOST"))
+	if !ok {
+		redisHost = "localhost"
+	}
+
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:6379", redisHost),
+		Password: "",
+		DB:       0, // use default DB
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if _, err := redisClient.Ping(ctx).Result(); err != nil {
+		log.Fatalf("unable to ping redis server: %v", err)
+	}
+}
 
 func main() {
-	projectID, ok := os.LookupEnv("GOOGLE_PROJECT_ID")
-	if !ok {
-		log.Fatalf("GOOGLE_PROJECT_ID env var is required")
-	}
-
-	zone, ok := os.LookupEnv("PUBSUB_ZONE")
-	if !ok {
-		log.Fatalf("PUBSUB_ZONE env var is required")
-	}
-
-	topicID, ok := os.LookupEnv("PUBSUB_TOPIC_ID")
-	if !ok {
-		log.Fatalf("PUBSUB_TOPIC_ID env var is required")
-	}
-
-	bearerToken, ok := os.LookupEnv("TWITTER_BEARER_TOKEN")
-	if !ok {
-		log.Fatalf("PUBSUB_TOPIC_ID env var is required")
-	}
-
 	// subscribe for process interruption signals
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
@@ -45,21 +61,11 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Create the publisher client.
-	var err error
-	publisher, err = pscompat.NewPublisherClient(ctx,
-		fmt.Sprintf("projects/%s/locations/%s/topics/%s", projectID, zone, topicID),
-	)
-	if err != nil {
-		log.Fatalf("pscompat.NewPublisherClient error: %v", err)
-	}
-	defer publisher.Stop()
-
 	// initializes twitter API client
-	var client *twitter.Client
-	client, err = twitter.WithBearerToken(bearerToken)
+	var err error
+	twitterClient, err = twitter.WithBearerToken(twitterToken)
 	if err != nil {
-		log.Fatalf("unable to initialize client: %+v\n", err)
+		log.Fatalf("unable to initialize twitter client: %+v\n", err)
 	}
 
 	params := make(map[string][]string)
@@ -79,7 +85,7 @@ func main() {
 	}
 
 	var channel *twitter.Channel
-	channel, err = client.SearchStream(ctx, params)
+	channel, err = twitterClient.SearchStream(ctx, params)
 	if err != nil {
 		log.Fatalf("unable to listen to tweets stream: %+v", err)
 	}
@@ -93,7 +99,6 @@ func main() {
 		case <-ctx.Done():
 			fmt.Printf("close stream from channel consumer\n")
 			channel.Close()
-			publisher.Stop()
 			return
 		case message, ok := <-channel.Receive():
 			if message == nil || !ok {
@@ -118,13 +123,17 @@ func publish(ctx context.Context, message *twitter.SearchStreamResponse) error {
 		return err
 	}
 
-	_, err = publisher.Publish(ctx, &pubsub.Message{
-		Data: messageBytes,
-	}).Get(ctx)
-	if err != nil {
-		fmt.Printf("publish failed, trying again\n")
+	if _, err = redisClient.XAdd(ctx, &redis.XAddArgs{
+		Stream: streamName,
+		Values: map[string]interface{}{
+			"data": messageBytes,
+		},
+	}).Result(); err != nil {
+		fmt.Printf("publish failed: %+v\n", err)
+		fmt.Printf("trying again\n")
 		return publish(ctx, message)
 	}
+
 	fmt.Printf("msg published\n")
 	return nil
 }
